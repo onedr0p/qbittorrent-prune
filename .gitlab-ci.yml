@@ -1,0 +1,44 @@
+stages:
+  - build
+
+variables:
+  DOCKER_CLI_EXPERIMENTAL: enabled
+  IMAGE: onedr0p/qbittorrent-prune
+
+before_script:
+  - echo "${DOCKERHUB_PASSWORD}" | docker login -u onedr0p --password-stdin
+  - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  - wget -q https://github.com/docker/buildx/releases/download/v0.3.1/buildx-v0.3.1.linux-amd64
+  - chmod +x buildx-v0.3.1.linux-amd64
+  - mkdir -p ~/.docker/cli-plugins/
+  - mv buildx-v0.3.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
+
+master:
+  image: docker:stable
+  stage: build
+  services:
+    - name: docker:dind
+      command: ["--experimental"]
+  script:
+    - docker buildx create --use --name whatever
+    - docker buildx build -t ${IMAGE}:${CI_COMMIT_REF_NAME}
+      -f Dockerfile
+      --platform linux/arm/v7,linux/arm64,linux/amd64
+      --push .
+  only: 
+    - master
+
+tags:
+  image: docker:stable
+  stage: build
+  services:
+    - name: docker:dind
+      command: ["--experimental"]
+  script:
+    - docker buildx create --use --name whatever
+    - docker buildx build -t ${IMAGE}:${CI_COMMIT_TAG}
+      -f Dockerfile
+      --platform linux/arm/v7,linux/arm64,linux/amd64
+      --push .
+  only: 
+    - tags
