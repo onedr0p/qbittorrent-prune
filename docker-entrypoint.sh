@@ -10,7 +10,7 @@ CRON_SCHEDULE=${CRON_SCHEDULE:-"0 */12 * * *"}
 printenv | sed 's/^\(.*\)$/export \1/g' > /root/app_env.sh
 
 # Create the cron file and redirect output of script to tini (PID-1 in most cases)
-echo "${CRON_SCHEDULE//\"} /usr/bin/script.sh > /proc/${TINI_PID}/fd/1 2>/proc/${TINI_PID}/fd/2" | crontab -
+echo "${CRON_SCHEDULE//\"} /usr/bin/qbittorrent-prune.sh > /proc/${TINI_PID}/fd/1 2>/proc/${TINI_PID}/fd/2" | crontab -
 
 # Set cron to run in the foreground
 exec crond -f -l 8

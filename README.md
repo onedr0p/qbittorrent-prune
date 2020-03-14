@@ -23,8 +23,8 @@ This is like the [gist I posted for transmission](https://gist.github.com/onedr0
 
 ```bash
 cp .env.sample .env
-chmod +x script.sh
-./script.sh
+chmod +x qbittorrent-prune.sh
+./qbittorrent-prune.sh
 ```
 
 ## Deployment example with docker-compose
