@@ -1,0 +1,32 @@
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  namespace: default
+  name: qbittorrent-prune
+spec:
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: QB_HOSTNAME
+            value: "http://qbittorrent-gui.default.svc.cluster.local:8080"
+          - name: QB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: qbittorrent
+                key: username
+          - name: QB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: qbittorrent
+                key: password
+          - name: QB_CATEGORIES
+            value: "sonarr,radarr"
+          - name: LOG_LEVEL
+            value: "2"
+          - name: DRY_RUN
+            value: "true"
+          restartPolicy: OnFailure

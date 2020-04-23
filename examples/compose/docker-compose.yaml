@@ -1,0 +1,15 @@
+---
+version: '3.7'
+
+services:
+  qbittorrent-prune:
+    image: onedr0p/qbittorrent-prune:latest
+    environment:
+      DRY_RUN: "true"
+      QB_URL: ""
+      QB_USERNAME: ""
+      QB_PASSWORD: ""
+      QB_DELETE_FILES: "true"
+      QB_CATEGORIES: "radarr,sonarr"
+      PUSHOVER_TOKEN: ""
+      PUSHOVER_USER_KEY: ""
