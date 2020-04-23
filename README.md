@@ -1,6 +1,6 @@
 # qbittorrent-prune
 
-Script to delete torrents from qBittorrent that have a tracker error like `Torrent not Registered` or `Unregistered torrent`. This script currently only supports monitoring up to 3 categories in qBittorrent to check for tracker errors.
+Script to delete torrents from qBittorrent that have a tracker error like `Torrent not Registered` or `Unregistered torrent`.
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/onedr0p/qbittorrent-prune)](https://hub.docker.com/r/onedr0p/qbittorrent-prune)
 
