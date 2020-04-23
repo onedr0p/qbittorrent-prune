@@ -74,7 +74,7 @@ fi
 # TORRENT_COMPLETED_LIST=$(curl -s --fail --cookie "SID=${COOKIE}" "${API_URL}/torrents/info?filter=completed" | jq -r '.[] | select(.state=="stalledUP"'))
 
 # Iterate thru each QB_CATEGORY_x and append torrent hash to array
-# declare -a TORRENT_HASHES=()
+# TORRENT_HASHES=()
 # for CATEGORY in "${!QB_CATEGORY_@}"; do
 #   CAT=${!CATEGORY}
 #   TORRENT_HASHES+=($(echo $TORRENT_COMPLETED_LIST | jq -r --arg CAT "${CAT}" '.[] | select(.category==$CAT) | .hash' && printf '\0'))
