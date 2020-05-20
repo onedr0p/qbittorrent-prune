@@ -52,7 +52,7 @@ fi
 api_url="${QB_URL}/api/v2"
 
 # Log into qBittorrent and save the cookie in a variable
-cookie=$(curl -s --fail -i --header "Referer: ${QB_URL}" --data "username=${QB_USERNAME}&password=${QB_PASSWORD}" "${api_url}/auth/login" | grep "set-cookie: SID" | awk -F[=";"] '{print $2}')
+cookie=$(curl -s -k --fail -i --header "Referer: ${QB_URL}" --data "username=${QB_USERNAME}&password=${QB_PASSWORD}" "${api_url}/auth/login" | grep "set-cookie: SID" | awk -F[=";"] '{print $2}')
 if [[ -z "${cookie}" ]]; then
     [[ ${LOG_LEVEL} -ge 1 ]] && echo "$(date -u) - ERROR: Could not log into qBittorrent, problem with host, port or credentials?"
     exit 1
@@ -61,7 +61,7 @@ else
 fi
 
 # Check the API Version
-api_version=$(curl -s --fail --cookie "SID=${cookie}" "${api_url}/app/webapiVersion")
+api_version=$(curl -s -k --fail --cookie "SID=${cookie}" "${api_url}/app/webapiVersion")
 valid_api_version_regex="^2\.."
 if [[ ! "${api_version}" =~ ${valid_api_version_regex} ]]; then
     [[ ${LOG_LEVEL} -ge 1 ]] && echo "$(date -u) - ERROR: qBittorrent version '${api_version}' is not supported by this script"
@@ -71,7 +71,7 @@ fi
 # Iterate thru each comma delimited value in QB_CATEGORIES and append torrent hash to array based on filters
 torrent_hashes=()
 for category in ${QB_CATEGORIES//,/ }; do
-    hash=$(curl -s --fail --cookie "SID=${cookie}" "${api_url}/torrents/info?filter=completed" | jq -r --arg CATEGORY "${category}" '.[] | select( (.category==$CATEGORY) and (.state=="stalledUP") ) | .hash' && printf '\0')
+    hash=$(curl -s -k --fail --cookie "SID=${cookie}" "${api_url}/torrents/info?filter=completed" | jq -r --arg CATEGORY "${category}" '.[] | select( (.category==$CATEGORY) and (.state=="stalledUP") ) | .hash' && printf '\0')
     torrent_hashes+=("${hash}")
 done
 
@@ -87,7 +87,7 @@ fi
 failed_torrent_hashes=()
 for torrent_hash in "${torrent_hashes[@]}"
 do
-    has_error=$(curl -s --fail --cookie "SID=${cookie}" "${api_url}/torrents/trackers?hash=${torrent_hash}" | jq -r '.[] | select(.msg | test("(not registered)|(unregistered)";"i"))')
+    has_error=$(curl -s -k --fail --cookie "SID=${cookie}" "${api_url}/torrents/trackers?hash=${torrent_hash}" | jq -r '.[] | select(.msg | test("(not registered)|(unregistered)";"i"))')
     if [ "${has_error}" != "" ]; then
         failed_torrent_hashes+=("${torrent_hash}")
     fi
@@ -103,11 +103,11 @@ fi
 for failed_torrent_hash in "${failed_torrent_hashes[@]}"
 do
     # Get the torrent name
-    torrent_name=$(curl -s --fail --cookie "SID=${cookie}" "${api_url}/torrents/files?hash=${failed_torrent_hash}" | jq -r '.[] | .name')
+    torrent_name=$(curl -s -k --fail --cookie "SID=${cookie}" "${api_url}/torrents/files?hash=${failed_torrent_hash}" | jq -r '.[] | .name')
 
     # Delete the torrent
     if [ "${DRY_RUN}" == "false" ]; then
-        http_response_code=$(curl -s -o /dev/null -w "%{http_code}" --cookie "SID=${cookie}" "${api_url}/torrents/delete?hashes=${failed_torrent_hash}&deleteFiles=${QB_DELETE_FILES}")
+        http_response_code=$(curl -s -k -o /dev/null -w "%{http_code}" --cookie "SID=${cookie}" "${api_url}/torrents/delete?hashes=${failed_torrent_hash}&deleteFiles=${QB_DELETE_FILES}")
         valid_response_regex="(2|3)[\d]{2}"
         if [[ ! "${http_response_code}" =~ ${valid_response_regex} ]]; then
             [[ ${LOG_LEVEL} -ge 1 ]] && echo "$(date -u) - ERROR: Unable to delete torrent ${torrent_name}"
@@ -118,7 +118,7 @@ do
             # Send Pushover notification if enabled
             if [[ "${PUSHOVER_USER_KEY}" ]] && [[ "${PUSHOVER_TOKEN}" ]]; then
                 title="Torrent deleted from qBittorrent"
-                curl -s -X POST -d "token=${PUSHOVER_TOKEN}&user=${PUSHOVER_USER_KEY}&title=\"${title}\"&message=\"${torrent_name}\"&priority=${PUSHOVER_PRIORITY}" \
+                curl -s -k -X POST -d "token=${PUSHOVER_TOKEN}&user=${PUSHOVER_USER_KEY}&title=\"${title}\"&message=\"${torrent_name}\"&priority=${PUSHOVER_PRIORITY}" \
                     'https://api.pushover.net/1/messages.json'
             fi
         fi
