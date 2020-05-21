@@ -25,6 +25,7 @@ See examples in the [examples/kubernetes](./examples/kubernetes/) directory
 | `QB_PASSWORD`       | qBittorrent password                                                        |         |    ✅     |
 | `QB_DELETE_FILES`   | Set this to `false` to keep the files on disk, but delete from qBittorrent  | `true`  |    ❌     |
 | `QB_CATEGORIES`     | Comma delimited list of categories in qBittorrent that will be checked      |         |    ✅     |
+| `DISABLE_SSL_VERIFY`| Set to `true` to disable SSL verification                                   | `false` |    ❌     |
 | `PUSHOVER_USER_KEY` | Set to your Pushover User Key to enable notifications                       |         |    ❌     |
 | `PUSHOVER_TOKEN`    | Set to your Pushover Application Key to enable notifications                |         |    ❌     |
 | `PUSHOVER_PRIORITY` | Set Pushover notification priority                                          | `-1`    |    ❌     |
