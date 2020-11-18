@@ -12,13 +12,6 @@ QB_DELETE_FILES=${QB_DELETE_FILES:-"true"}
 PUSHOVER_PRIORITY=${PUSHOVER_PRIORITY:-1}
 DISABLE_SSL_VERIFY=${DISABLE_SSL_VERIFY:-"false"}
 
-# Exit script if currently running
-# shellcheck disable=SC2006,SC2086
-if pidof -o %PPID -x "`basename $0`">/dev/null; then
-    [[ ${LOG_LEVEL} -ge 1 ]] && echo "$(date -u) - ERROR: Script already running"
-    exit 1
-fi
-
 # Exit script if we don't have the necessary environment variables
 if
     [[ -z "${QB_URL}" ]] ||

@@ -3,7 +3,7 @@ version: '3.7'
 
 services:
   qbittorrent-prune:
-    image: onedr0p/qbittorrent-prune:latest
+    image: onedr0p/qbittorrent-prune:v3.0.1
     environment:
       DRY_RUN: "true"
       QB_URL: ""
