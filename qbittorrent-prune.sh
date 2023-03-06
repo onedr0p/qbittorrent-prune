@@ -74,8 +74,8 @@ fi
 # Iterate thru each comma delimited value in QB_CATEGORIES and append torrent hash to array based on filters
 torrent_hashes=()
 for category in ${QB_CATEGORIES//,/ }; do
-    hash=$(${CURL_CMD} --fail --cookie "SID=${cookie}" "${api_url}/torrents/info?filter=completed" | jq -r --arg CATEGORY "${category}" '.[] | select( (.category==$CATEGORY) and (.state=="stalledUP") ) | .hash' && printf '\0')
-    torrent_hashes+=("${hash}")
+    hash=$(${CURL_CMD} --fail --cookie "SID=${cookie}" "${api_url}/torrents/info?filter=completed" | jq -r --arg CATEGORY "${category}" '.[] | select( (.category==$CATEGORY) and (.state=="stalledUP") ) | .hash')
+    torrent_hashes+=(${hash[@]})
 done
 
 # Exit if no torrents are found in categories
@@ -110,8 +110,8 @@ do
 
     # Delete the torrent
     if [ "${DRY_RUN}" == "false" ]; then
-        http_response_code=$(${CURL_CMD} -o /dev/null -w "%{http_code}" --cookie "SID=${cookie}" "${api_url}/torrents/delete?hashes=${failed_torrent_hash}&deleteFiles=${QB_DELETE_FILES}")
-        valid_response_regex="(2|3)[\d]{2}"
+        http_response_code=$(${CURL_CMD} -X POST -o /dev/null -w "%{http_code}" --cookie "SID=${cookie}" -d "hashes=${failed_torrent_hash}&deleteFiles=${QB_DELETE_FILES}" "${api_url}/torrents/delete")
+        valid_response_regex="(2|3)[0-9]{2}"
         if [[ ! "${http_response_code}" =~ ${valid_response_regex} ]]; then
             [[ ${LOG_LEVEL} -ge 1 ]] && echo "$(date -u) - ERROR: Unable to delete torrent ${torrent_name}"
             [[ ${LOG_LEVEL} -ge 1 ]] && echo "$(date -u) - ERROR: Invalid HTTP Status Code: ${http_response_code}"
