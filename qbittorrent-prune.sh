@@ -110,7 +110,7 @@ do
 
     # Delete the torrent
     if [ "${DRY_RUN}" == "false" ]; then
-        http_response_code=$(${CURL_CMD} -o /dev/null -w "%{http_code}" --cookie "SID=${cookie}" "${api_url}/torrents/delete?hashes=${failed_torrent_hash}&deleteFiles=${QB_DELETE_FILES}")
+        http_response_code=$(${CURL_CMD} -X POST -o /dev/null -w "%{http_code}" --cookie "SID=${cookie}" -d "hashes=${failed_torrent_hash}&deleteFiles=${QB_DELETE_FILES}" "${api_url}/torrents/delete")
         valid_response_regex="(2|3)[\d]{2}"
         if [[ ! "${http_response_code}" =~ ${valid_response_regex} ]]; then
             [[ ${LOG_LEVEL} -ge 1 ]] && echo "$(date -u) - ERROR: Unable to delete torrent ${torrent_name}"
