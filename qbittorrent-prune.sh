@@ -74,8 +74,8 @@ fi
 # Iterate thru each comma delimited value in QB_CATEGORIES and append torrent hash to array based on filters
 torrent_hashes=()
 for category in ${QB_CATEGORIES//,/ }; do
-    hash=$(${CURL_CMD} --fail --cookie "SID=${cookie}" "${api_url}/torrents/info?filter=completed" | jq -r --arg CATEGORY "${category}" '.[] | select( (.category==$CATEGORY) and (.state=="stalledUP") ) | .hash' && printf '\0')
-    torrent_hashes+=("${hash}")
+    hash=$(${CURL_CMD} --fail --cookie "SID=${cookie}" "${api_url}/torrents/info?filter=completed" | jq -r --arg CATEGORY "${category}" '.[] | select( (.category==$CATEGORY) and (.state=="stalledUP") ) | .hash')
+    torrent_hashes+=(${hash[@]})
 done
 
 # Exit if no torrents are found in categories
